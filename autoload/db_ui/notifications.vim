@@ -75,38 +75,11 @@ function! s:notification_nvim(msg, opts) abort
   let width = get(a:opts, 'width', s:width)
   let title = get(a:opts, 'title', s:title)
   let msg = type(a:msg) !=? type([]) ? [a:msg] : a:msg
-  if !empty(title)
-    let msg = [title] + msg
-  endif
 
-  let height = 0
-  for line in msg
-    let height += len(split(line,'.\{'.width.'}\zs'))
-  endfor
   let delay = get(a:opts, 'delay', s:delay)
-  let type = get(a:opts, 'type', 'info')
-  let pos = get(a:opts, 'pos', s:pos)
-  let pos_map = {'topleft': 'NW', 'topright': 'NE', 'botleft': 'SW', 'botright': 'SE', 'top': 'NW', 'bottom': 'SW'}
-
-  let pos_opts = s:get_pos(pos, width)
-  let pos_opts.anchor = pos_map[pos]
-  let opts = extend(pos_opts, {
-        \ 'relative': 'editor',
-        \ 'width': width,
-        \ 'height': height,
-        \ 'style': 'minimal',
-        \ })
-
-  call s:nvim_close()
-  let buf = nvim_create_buf(v:false, v:true)
-  call nvim_buf_set_lines(buf, 0, -1, v:false, msg)
-
-  let s:win = nvim_open_win(buf, v:false, opts)
-  silent! exe 'autocmd BufEnter <buffer='.buf.'> :bw!'
-  call nvim_win_set_option(s:win, 'wrap', v:true)
-  call nvim_win_set_option(s:win, 'signcolumn', 'yes') "simulate left padding
-  call nvim_win_set_option(s:win, 'winhl', 'Normal:'.s:hl_by_type[type])
-  let s:timer = timer_start(delay, {-> s:nvim_close()})
+  let level = get(a:opts, 'type', 'info')
+  " let pos = get(a:opts, 'pos', s:pos)
+  call luaeval('vim.notify(_A[1], _A[2], { title = _A[3], delay = _A[4] })', [msg, level, title, delay])
   let s:last_msg = a:msg
 endfunction
 

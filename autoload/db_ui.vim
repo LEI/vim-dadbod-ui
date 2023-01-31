@@ -379,7 +379,8 @@ function! s:dbui.connect(db) abort
 
   try
     let query_time = reltime()
-    call db_ui#notifications#info('Connecting to db '.a:db.name.'...', { 'echo': 1 })
+    let opts = has('nvim') ? { 'type': 'info' } : { 'echo': 1 }
+    call db_ui#notifications#info('Connecting to db '.a:db.name.'...', opts)
     let a:db.conn = db#connect(a:db.url)
     let a:db.conn_error = ''
     call db_ui#notifications#info('Connected to db '.a:db.name.' after '.split(reltimestr(reltime(query_time)))[0].' sec.')
